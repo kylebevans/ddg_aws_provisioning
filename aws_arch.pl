@@ -39,33 +39,37 @@ my $stackid = $stackoutput->StackId;
 # DescribeEvents is also paginated, so you have to get the first page, process it,
 # then loop through all of the other pages if they exist and process them.
 # change so it checks for keys and values bc only one subnet shows
-my %eventlist;
-while (!('CREATE_COMPLETE AWS::CloudFormation::Stack' ~~ [keys %eventlist]) && !('ROLLBACK_COMPLETE AWS::CloudFormation::Stack' ~~ [keys %eventlist])) {
+my @eventlist;
+while (!(grep(/CREATE_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist)) && !(grep(/ROLLBACK_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist))) {
   # process first page of events
-  my $stackevents = $cfddg->DescribeStackEvents(StackName => $stackid);
-  foreach $stackevent ($stackevents->StackEvents) {
-    $stackeventobj = shift @$stackevent;
-    $rstatus = $stackeventobj->ResourceStatus;
-    $rtype = $stackeventobj->ResourceType;
-    $lrid = $stackeventobj->LogicalResourceId;
-    $eventlistmember = $rstatus . " " . $rtype . " " . $lrid;
-    if (!($eventlistmember ~~ @eventlist)) {
-      push @eventlist, $eventlistmember;
-      print $eventlistmember . "\n";
+  my $stackeventsoutput = $cfddg->DescribeStackEvents(StackName => $stackid);
+  @stackeventlists = $stackeventsoutput->StackEvents;
+  foreach $stackeventlist (@stackeventlists) {
+    while ($stackevent = shift(@$stackeventlist)) {
+      $rstatus = $stackevent->ResourceStatus;
+      $rtype = $stackevent->ResourceType;
+      $lrid = $stackevent->LogicalResourceId;
+      $eventlistmember = $rstatus . " " . $rtype . " " . $lrid;
+      if (!(grep($eventlistmember eq $_, @eventlist))) {
+        push @eventlist, $eventlistmember;
+        print $eventlistmember . "\n";
+      }
     }
   }
   # process the rest of the pages of events if they exist
-  while ($stackevents->NextToken) {
-    $stackevents = $cfddg->DescribeStackEvents(StackName => $stackid, NextToken => $stackevents->NextToken);
-    foreach $stackevent ($stackevents->StackEvents) {
-      $stackeventobj = shift @$stackevent;
-      $rstatus = $stackeventobj->ResourceStatus;
-      $rtype = $stackeventobj->ResourceType;
-      $lrid = $stackeventobj->LogicalResourceId;
-      $eventlistmember = $rstatus . " " . $rtype . " " . $lrid;
-      if (!($eventlistmember ~~ @eventlist)) {
-        push @eventlist, $eventlistmember;
-        print $eventlistmember . "\n";
+  while ($stackeventsoutput->NextToken) {
+    $stackeventsoutput = $cfddg->DescribeStackEvents(StackName => $stackid, NextToken => $stackevents->NextToken);
+    @stackeventlists = $stackeventsoutput->StackEvents;
+    foreach $stackeventlist (@stackeventlists) {
+      while ($stackevent = shift(@$stackeventlist)) {
+        $rstatus = $stackevent->ResourceStatus;
+        $rtype = $stackevent->ResourceType;
+        $lrid = $stackevent->LogicalResourceId;
+        $eventlistmember = $rstatus . " " . $rtype . " " . $lrid;
+        if (!(grep($eventlistmember eq $_, @eventlist))) {
+          push @eventlist, $eventlistmember;
+          print $eventlistmember . "\n";
+        }
       }
     }
   }
