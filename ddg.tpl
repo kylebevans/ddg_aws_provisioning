@@ -28,7 +28,7 @@
     }
   },
   "Resources": {
-    "ddgvpc" : {
+    "ddgVPC" : {
          "Type" : "AWS::EC2::VPC",
          "Properties" : {
           "CidrBlock" : "10.0.0.0/16",
@@ -37,10 +37,16 @@
           "InstanceTenancy" : "default"
          }
     },
-    "ddgsubneta": {
+    "ddgRouteTable" : {
+      "Type" : "AWS::EC2::RouteTable",
+      "Properties" : {
+        "VpcId" : { "Ref" : "ddgVPC" }
+      }
+    },
+    "ddgSubnetA": {
       "Type" : "AWS::EC2::Subnet",
       "Properties" : {
-        "VpcId" : { "Ref" : "ddgvpc" },
+        "VpcId" : { "Ref" : "ddgVPC" },
         "CidrBlock" : "10.0.0.0/20",
         "AvailabilityZone" : {
           "Fn::FindInMap": [
@@ -53,10 +59,10 @@
         }
       }
     },
-    "ddgsubnetb": {
+    "ddgSubnetB": {
       "Type" : "AWS::EC2::Subnet",
       "Properties" : {
-        "VpcId" : { "Ref" : "ddgvpc" },
+        "VpcId" : { "Ref" : "ddgVPC" },
         "CidrBlock" : "10.0.16.0/20",
         "AvailabilityZone" : {
           "Fn::FindInMap": [
@@ -69,10 +75,10 @@
         }
       }
     },
-    "ddgsubnetc": {
+    "ddgSubnetC": {
       "Type" : "AWS::EC2::Subnet",
       "Properties" : {
-        "VpcId" : { "Ref" : "ddgvpc" },
+        "VpcId" : { "Ref" : "ddgVPC" },
         "CidrBlock" : "10.0.32.0/20",
         "AvailabilityZone" : {
           "Fn::FindInMap": [
@@ -85,11 +91,51 @@
         }
       }
     },
-    "Ipv6VPCCidrBlock": {
+    "ddgSubnetARouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "ddgSubnetA" },
+        "RouteTableId" : { "Ref" : "ddgRouteTable" }
+      }
+    },
+    "ddgSubnetBRouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "ddgSubnetB" },
+        "RouteTableId" : { "Ref" : "ddgRouteTable" }
+      }
+    },
+    "ddgSubnetCRouteTableAssociation" : {
+      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+      "Properties" : {
+        "SubnetId" : { "Ref" : "ddgSubnetC" },
+        "RouteTableId" : { "Ref" : "ddgRouteTable" }
+      }
+    },
+    "ddgIpv6VPCCidrBlock": {
       "Type": "AWS::EC2::VPCCidrBlock",
       "Properties": {
         "AmazonProvidedIpv6CidrBlock": true,
-        "VpcId": { "Ref" : "ddgvpc" }
+        "VpcId": { "Ref" : "ddgVPC" }
+      }
+    },
+    "ddgGateway": {
+      "Type" : "AWS::EC2::InternetGateway"
+    },
+    "ddgGatewayAttachment": {
+      "Type" : "AWS::EC2::VPCGatewayAttachment",
+      "Properties" : {
+        "VpcId" : { "Ref" : "ddgVPC" },
+        "InternetGatewayId" : { "Ref" : "ddgGateway" }
+      }
+    },
+    "ddgDefaultRoute" : {
+      "Type" : "AWS::EC2::Route",
+      "DependsOn" : "ddgGatewayAttachment",
+      "Properties" : {
+        "RouteTableId" : { "Ref" : "ddgRouteTable" },
+        "DestinationCidrBlock" : "0.0.0.0/0",
+        "GatewayId" : { "Ref" : "ddgGateway" }
       }
     },
     "chefinstance": {
@@ -112,16 +158,16 @@
           "AssociatePublicIpAddress" : "true",
           "DeviceIndex"              : "0",
           "DeleteOnTermination"      : "true",
-          "SubnetId"                 : { "Ref" : "ddgsubneta" },
-          "GroupSet"                 : [{ "Ref": "chefsecuritygroup" }]
+          "SubnetId"                 : { "Ref" : "ddgSubnetA" },
+          "GroupSet"                 : [{ "Ref": "ddgChefSecurityGroup" }]
         }]
       }
     },
-    "chefsecuritygroup": {
+    "ddgChefSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
         "GroupDescription": "Enable SSH access via port 22",
-        "VpcId": { "Ref" : "ddgvpc" },
+        "VpcId": { "Ref" : "ddgVPC" },
         "SecurityGroupIngress": [
           {
             "IpProtocol": "tcp",
