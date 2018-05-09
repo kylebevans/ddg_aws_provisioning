@@ -47,10 +47,11 @@ while (!('CREATE_COMPLETE AWS::CloudFormation::Stack' ~~ [keys %eventlist]) && !
     $stackeventobj = shift @$stackevent;
     $rstatus = $stackeventobj->ResourceStatus;
     $rtype = $stackeventobj->ResourceType;
-    $eventlistkey = $rstatus . " " . $rtype;
-    if (!($eventlistkey ~~ [keys %eventlist])) {
-      $eventlist{$eventlistkey} = $stackeventobj->LogicalResourceId;
-      print $eventlistkey . " " . $eventlist{$eventlistkey} . "\n";
+    $lrid = $stackeventobj->LogicalResourceId;
+    $eventlistmember = $rstatus . " " . $rtype . " " . $lrid;
+    if (!($eventlistobj ~~ @eventlist)) {
+      push @eventlist, $eventlistmember;
+      print $eventlistmember . "\n";
     }
   }
   # process the rest of the pages of events if they exist
@@ -60,10 +61,11 @@ while (!('CREATE_COMPLETE AWS::CloudFormation::Stack' ~~ [keys %eventlist]) && !
       $stackeventobj = shift @$stackevent;
       $rstatus = $stackeventobj->ResourceStatus;
       $rtype = $stackeventobj->ResourceType;
-      $eventlistkey = $rstatus . " " . $rtype;
-      if (!($eventlistkey ~~ [keys %eventlist])) {
-        $eventlist{$eventlistkey} = $stackeventobj->LogicalResourceId;
-        print $eventlistkey . " " . $eventlist{$eventlistkey} . "\n";
+      $lrid = $stackeventobj->LogicalResourceId;
+      $eventlistmember = $rstatus . " " . $rtype . " " . $lrid;
+      if (!($eventlistobj ~~ @eventlist)) {
+        push @eventlist, $eventlistmember;
+        print $eventlistmember . "\n";
       }
     }
   }
