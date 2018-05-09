@@ -41,7 +41,7 @@ my $stackid = $stackoutput->StackId;
 my @eventlist;
 while (!(grep(/CREATE_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist)) && !(grep(/ROLLBACK_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist))) {
   # process first page of events
-  my $stackeventsoutput = $cfddg->DescribeStackEvents(StackName => $stackid);
+  my $stackeventsoutput = $cfddg->DescribeStackEvents(StackName => $stackid) or die "describe stack events failed: $!";
   @stackeventlists = $stackeventsoutput->StackEvents;
   foreach $stackeventlist (@stackeventlists) {
     while ($stackevent = shift(@$stackeventlist)) {
@@ -57,7 +57,7 @@ while (!(grep(/CREATE_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist)) && !(
   }
   # process the rest of the pages of events if they exist
   while ($stackeventsoutput->NextToken) {
-    $stackeventsoutput = $cfddg->DescribeStackEvents(StackName => $stackid, NextToken => $stackevents->NextToken);
+    $stackeventsoutput = $cfddg->DescribeStackEvents(StackName => $stackid, NextToken => $stackevents->NextToken) or die "describe stack events failed: $!";
     @stackeventlists = $stackeventsoutput->StackEvents;
     foreach $stackeventlist (@stackeventlists) {
       while ($stackevent = shift(@$stackeventlist)) {
