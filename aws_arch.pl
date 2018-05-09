@@ -49,7 +49,7 @@ while (!('CREATE_COMPLETE AWS::CloudFormation::Stack' ~~ [keys %eventlist]) && !
     $rtype = $stackeventobj->ResourceType;
     $lrid = $stackeventobj->LogicalResourceId;
     $eventlistmember = $rstatus . " " . $rtype . " " . $lrid;
-    if (!($eventlistobj ~~ @eventlist)) {
+    if (!($eventlistmember ~~ @eventlist)) {
       push @eventlist, $eventlistmember;
       print $eventlistmember . "\n";
     }
@@ -63,7 +63,7 @@ while (!('CREATE_COMPLETE AWS::CloudFormation::Stack' ~~ [keys %eventlist]) && !
       $rtype = $stackeventobj->ResourceType;
       $lrid = $stackeventobj->LogicalResourceId;
       $eventlistmember = $rstatus . " " . $rtype . " " . $lrid;
-      if (!($eventlistobj ~~ @eventlist)) {
+      if (!($eventlistmember ~~ @eventlist)) {
         push @eventlist, $eventlistmember;
         print $eventlistmember . "\n";
       }
