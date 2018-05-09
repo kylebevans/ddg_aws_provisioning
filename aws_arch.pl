@@ -38,7 +38,6 @@ my $stackid = $stackoutput->StackId;
 # a hash of all the events gotten over time and doesn't print duplicates.
 # DescribeEvents is also paginated, so you have to get the first page, process it,
 # then loop through all of the other pages if they exist and process them.
-# change so it checks for keys and values bc only one subnet shows
 my @eventlist;
 while (!(grep(/CREATE_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist)) && !(grep(/ROLLBACK_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist))) {
   # process first page of events
