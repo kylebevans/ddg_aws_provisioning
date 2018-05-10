@@ -138,7 +138,7 @@
         "GatewayId" : { "Ref" : "ddgGateway" }
       }
     },
-    "chefinstance": {
+    "ddgChefInstance": {
       "Type": "AWS::EC2::Instance",
       "Properties": {
         "KeyName": {

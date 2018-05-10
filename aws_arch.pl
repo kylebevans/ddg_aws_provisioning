@@ -46,9 +46,10 @@ while (!(grep(/CREATE_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist)) && !(
   foreach $stackeventlist (@stackeventlists) {
     while ($stackevent = shift(@$stackeventlist)) {
       $rstatus = $stackevent->ResourceStatus;
+      $rstatusreason = $stackevent->ResourceStatusReason;
       $rtype = $stackevent->ResourceType;
       $lrid = $stackevent->LogicalResourceId;
-      $eventlistmember = $rstatus . " " . $rtype . " " . $lrid;
+      $eventlistmember = $rstatus . " " . $rtype . " " . $lrid . " " . $rstatusreason;
       if (!(grep($eventlistmember eq $_, @eventlist))) {
         push @eventlist, $eventlistmember;
         print $eventlistmember . "\n";
@@ -62,9 +63,10 @@ while (!(grep(/CREATE_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist)) && !(
     foreach $stackeventlist (@stackeventlists) {
       while ($stackevent = shift(@$stackeventlist)) {
         $rstatus = $stackevent->ResourceStatus;
+        $rstatusreason = $stackevent->ResourceStatusReason;
         $rtype = $stackevent->ResourceType;
         $lrid = $stackevent->LogicalResourceId;
-        $eventlistmember = $rstatus . " " . $rtype . " " . $lrid;
+        $eventlistmember = $rstatus . " " . $rtype . " " . $lrid . " " . $rstatusreason;
         if (!(grep($eventlistmember eq $_, @eventlist))) {
           push @eventlist, $eventlistmember;
           print $eventlistmember . "\n";
