@@ -14,7 +14,7 @@ my $cftemplate;
     $cftemplate = <$fh>;
 }
 
-
+# assumes AWS credentials are stored in ~/.aws/credentials
 # create the stack in us-east-2
 my $cfddg = Paws->service('CloudFormation', region => 'us-east-2') or die "can't create CloudFormation object: $!";
 

@@ -140,7 +140,57 @@
     },
     "ddgChefInstance": {
       "Type": "AWS::EC2::Instance",
-      "Properties": {
+      "Metadata" : {
+      "AWS::CloudFormation::Init" : {
+        "config" : {
+          "packages" : {
+            "apt" : {
+              "apt-transport-https" : []
+            }
+          },
+          "groups" : {
+            :
+          },
+          "users" : {
+            :
+          },
+          "sources" : {
+            :
+          },
+          "files" : {
+            "/etc/sources.list.d/chef-stable.list" : {
+              "content" : { "Fn::Join" : ["", [
+                "deb https://packages.chef.io/repos/apt/stable xenial main"
+              ]]},
+              "mode"  : "000644",
+              "owner" : "root",
+              "group" : "root"
+            }
+          },
+          "commands" : {
+            "add_chef_repo_key" : {
+              "command" : "wget -qO - https://packages.chef.io/chef.asc | sudo apt-key add -"
+            },
+            "apt_update" : {
+              "command: : "apt-get update"
+            },
+            "install_chef_server" : {
+              "command" : "apt-get install -y chef-server-core"
+            },
+            "configure_chef_server" : {
+              "command" : "chef-server-ctl reconfigure"
+            },
+            "create_chef_admin" : {
+              "command" : ""
+            }
+          },
+          "services" : {
+            :
+          }
+        }
+      }
+    },
+    "Properties": {
         "KeyName": {
           "Ref": "KeyName"
         },
