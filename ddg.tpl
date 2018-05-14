@@ -262,7 +262,7 @@
             }
           }
         }
-      }
+      },
       "Properties": {
         "KeyName": {
           "Ref": "KeyName"
