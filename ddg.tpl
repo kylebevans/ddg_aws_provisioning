@@ -257,7 +257,7 @@
                 "command" : "apt-get update && apt-get -y upgrade"
               },
               "run_chef" : {
-                "command" " "chef-solo -c solo.rb -j solo.json"
+                "command" : "chef-solo -c solo.rb -j solo.json"
               }
             }
           }
