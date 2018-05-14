@@ -209,7 +209,6 @@
         }
       }
     },
-
     "ddgIPv6SearchLaunchConfig": {
       "Type" : "AWS::AutoScaling::LaunchConfiguration",
       "Metadata" : {
@@ -327,12 +326,12 @@
           }
         ]
       }
-    },
-    "Outputs": {
-      "URL": {
-        "Description": "URL of the website",
-        "Value": { "Fn::Join": [ "", [ "http://", { "Fn::GetAtt": [ "ApplicationLoadBalancer", "DNSName" ] } ] ] }
-      }
+    }
+  },
+  "Outputs" : {
+    "URL": {
+      "Description": "URL of the website",
+      "Value": { "Fn::Join": [ "", [ "http://", { "Fn::GetAtt": [ "ddgIPv6SearchElasticLoadBalancer", "DNSName" ] } ] ] }
     }
   }
 }
