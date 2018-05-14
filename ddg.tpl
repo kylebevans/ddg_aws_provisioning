@@ -192,7 +192,7 @@
         "MaxSize" : "6",
         "DesiredCapacity" : "4",
         "HealthCheckGracePeriod" : "600",
-        "HealthCheckType" : "ELB"
+        "HealthCheckType" : "ELB",
         "TargetGroupARNs": [ { "Ref": "ddgIPv6SearchTargetGroup" } ]
       },
       "CreationPolicy" : {
