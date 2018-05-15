@@ -43,11 +43,26 @@
         "VpcId" : { "Ref" : "ddgVPC" }
       }
     },
+    "ddgIpv6VPCCidrBlock": {
+      "Type": "AWS::EC2::VPCCidrBlock",
+      "Properties": {
+        "AmazonProvidedIpv6CidrBlock": true,
+        "VpcId": { "Ref" : "ddgVPC" }
+      }
+    },
     "ddgSubnetA": {
       "Type" : "AWS::EC2::Subnet",
+      "DependsOn" : "ddgIpv6VPCCidrBlock",
       "Properties" : {
         "VpcId" : { "Ref" : "ddgVPC" },
         "CidrBlock" : "10.0.0.0/20",
+        "Ipv6CidrBlock": {
+          "Fn::Select": [
+            0, {
+              "Fn::Cidr": [ { "Fn::Select": [ 0, { "Fn::GetAtt": [ "ddgVPC", "Ipv6CidrBlocks" ] } ] }, "256", "64" ]
+            }
+          ]
+        },
         "AvailabilityZone" : {
           "Fn::FindInMap": [
             "AZMap",
@@ -61,9 +76,17 @@
     },
     "ddgSubnetB": {
       "Type" : "AWS::EC2::Subnet",
+      "DependsOn" : "ddgIpv6VPCCidrBlock",
       "Properties" : {
         "VpcId" : { "Ref" : "ddgVPC" },
         "CidrBlock" : "10.0.16.0/20",
+        "Ipv6CidrBlock": {
+          "Fn::Select": [
+            1, {
+              "Fn::Cidr": [ { "Fn::Select": [ 0, { "Fn::GetAtt": [ "ddgVPC", "Ipv6CidrBlocks" ] } ] }, "256", "64" ]
+            }
+          ]
+        },
         "AvailabilityZone" : {
           "Fn::FindInMap": [
             "AZMap",
@@ -77,9 +100,17 @@
     },
     "ddgSubnetC": {
       "Type" : "AWS::EC2::Subnet",
+      "DependsOn" : "ddgIpv6VPCCidrBlock",
       "Properties" : {
         "VpcId" : { "Ref" : "ddgVPC" },
         "CidrBlock" : "10.0.32.0/20",
+        "Ipv6CidrBlock": {
+          "Fn::Select": [
+            2, {
+              "Fn::Cidr": [ { "Fn::Select": [ 0, { "Fn::GetAtt": [ "ddgVPC", "Ipv6CidrBlocks" ] } ] }, "256", "64" ]
+            }
+          ]
+        },
         "AvailabilityZone" : {
           "Fn::FindInMap": [
             "AZMap",
@@ -112,13 +143,6 @@
         "RouteTableId" : { "Ref" : "ddgRouteTable" }
       }
     },
-    "ddgIpv6VPCCidrBlock": {
-      "Type": "AWS::EC2::VPCCidrBlock",
-      "Properties": {
-        "AmazonProvidedIpv6CidrBlock": true,
-        "VpcId": { "Ref" : "ddgVPC" }
-      }
-    },
     "ddgGateway": {
       "Type" : "AWS::EC2::InternetGateway"
     },
@@ -129,12 +153,21 @@
         "InternetGatewayId" : { "Ref" : "ddgGateway" }
       }
     },
-    "ddgDefaultRoute" : {
+    "ddgIPv4DefaultRoute" : {
       "Type" : "AWS::EC2::Route",
       "DependsOn" : "ddgGatewayAttachment",
       "Properties" : {
         "RouteTableId" : { "Ref" : "ddgRouteTable" },
         "DestinationCidrBlock" : "0.0.0.0/0",
+        "GatewayId" : { "Ref" : "ddgGateway" }
+      }
+    },
+    "ddgIPv6DefaultRoute" : {
+      "Type" : "AWS::EC2::Route",
+      "DependsOn" : "ddgGatewayAttachment",
+      "Properties" : {
+        "RouteTableId" : { "Ref" : "ddgRouteTable" },
+        "DestinationIpv6CidrBlock" : "::/0",
         "GatewayId" : { "Ref" : "ddgGateway" }
       }
     },
@@ -193,7 +226,8 @@
         "DesiredCapacity" : "4",
         "HealthCheckGracePeriod" : "600",
         "HealthCheckType" : "ELB",
-        "TargetGroupARNs": [ { "Ref": "ddgIPv6SearchTargetGroup" } ]
+        "TargetGroupARNs": [ { "Ref": "ddgIPv6SearchTargetGroup" } ],
+        "VPCZoneIdentifier" : [ {"Ref": "ddgSubnetA"}, {"Ref" : "ddgSubnetB"}, {"Ref" : "ddgSubnetC"} ]
       },
       "CreationPolicy" : {
         "ResourceSignal" : {
@@ -211,22 +245,20 @@
     },
     "ddgIPv6SearchLaunchConfig": {
       "Type" : "AWS::AutoScaling::LaunchConfiguration",
+      "DependsOn" : "ddgGatewayAttachment",
       "Metadata" : {
         "AWS::CloudFormation::Init" : {
           "config" : {
             "packages" : {
               "apt" : {
-                "apt-transport-https" : []
-              },
-              "chef" : {
                 "chef" : []
               }
             },
             "sources" : {
               "/var/chef/cookbooks/kbe_ddg_search" : "https://github.com/kylebevans/kbe_ddg_search/tarball/master",
-              "/var/chef/cookbooks/kbe_ddg_search" : "https://github.com/kylebevans/kbe_role_ubuntu_1604_base/tarball/master",
-              "/var/chef/cookbooks/kbe_ddg_search" : "https://github.com/kylebevans/kbe_login_banner/tarball/master",
-              "/var/chef/cookbooks/kbe_ddg_search" : "https://github.com/kylebevans/kbe_ssh/tarball/master"
+              "/var/chef/cookbooks/kbe_role_ubuntu_1604_base" : "https://github.com/kylebevans/kbe_role_ubuntu_1604_base/tarball/master",
+              "/var/chef/cookbooks/kbe_login_banner" : "https://github.com/kylebevans/kbe_login_banner/tarball/master",
+              "/var/chef/cookbooks/kbe_ssh" : "https://github.com/kylebevans/kbe_ssh/tarball/master"
             },
             "files" : {
               "/var/chef/solo.rb" : {
@@ -256,7 +288,7 @@
                 "command" : "apt-get update && apt-get -y upgrade"
               },
               "run_chef" : {
-                "command" : "chef-solo -c solo.rb -j solo.json"
+                "command" : "chef-solo -c /var/chef/solo.rb -j /var/chef/solo.json"
               }
             }
           }
@@ -266,6 +298,7 @@
         "KeyName": {
           "Ref": "KeyName"
         },
+        "AssociatePublicIpAddress" : "true",
         "ImageId": {
           "Fn::FindInMap": [
             "RegionMap",
@@ -275,14 +308,29 @@
             "AMI"
           ]
         },
+        "InstanceMonitoring" : "false",
         "InstanceType": "t2.micro",
-        "NetworkInterfaces" : [{
-          "AssociatePublicIpAddress" : "true",
-          "DeviceIndex"              : "0",
-          "DeleteOnTermination"      : "true",
-          "SubnetId"                 : { "Ref" : "ddgSubnetA" },
-          "GroupSet"                 : [{ "Ref": "ddgIPv6SearchSecurityGroup" }]
-        }]
+        "SecurityGroups": [ { "Ref": "ddgIPv6SearchSecurityGroup" } ],
+        "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
+          "#!/bin/bash -xe\n",
+
+          "apt-get -y update\n",
+          "apt-get -y upgrade\n",
+          
+          "apt-get -y install python-setuptools\n",
+          "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",
+          "ln -s /root/aws-cfn-bootstrap-latest/init/ubuntu/cfn-hup /etc/init.d/cfn-hup\n",
+            
+          "/usr/local/bin/cfn-init -v ",
+          "         --stack ", { "Ref" : "AWS::StackName" },
+          "         --resource ddgIPv6SearchLaunchConfig ",
+          "         --region ", { "Ref" : "AWS::Region" }, "\n",
+
+          "/usr/local/bin/cfn-signal -e $? ",
+          "         --stack ", { "Ref" : "AWS::StackName" },
+          "         --resource ddgIPv6SearchWebServerGroup ",
+          "         --region ", { "Ref" : "AWS::Region" }, "\n"
+        ]]}}
       }
     },
     "ddgIPv6SearchSecurityGroup": {
@@ -302,6 +350,18 @@
             "FromPort": "22",
             "ToPort": "22",
             "CidrIp": "50.4.40.89/32"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "SourceSecurityGroupId" : { "Ref" : "ddgALBSecurityGroup" }
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "SourceSecurityGroupId" : { "Ref" : "ddgALBSecurityGroup" }
           }
         ]
       }
@@ -323,6 +383,18 @@
             "FromPort": "443",
             "ToPort": "443",
             "CidrIp": "0.0.0.0/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "80",
+            "ToPort": "80",
+            "CidrIpv6": "::/0"
+          },
+          {
+            "IpProtocol": "tcp",
+            "FromPort": "443",
+            "ToPort": "443",
+            "CidrIpv6": "::/0"
           }
         ]
       }

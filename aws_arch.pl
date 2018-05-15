@@ -39,12 +39,12 @@ my $stackid = $stackoutput->StackId;
 # DescribeEvents is also paginated, so you have to get the first page, process it,
 # then loop through all of the other pages if they exist and process them.
 my @eventlist;
-while (!(grep(/CREATE_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist)) && !(grep(/ROLLBACK_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist))) {
+while (!(grep(/CREATE_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist)) && !(grep(/DELETE_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist)) && !(grep(/ROLLBACK_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist))) {
   # process first page of events
   my $stackeventsoutput = $cfddg->DescribeStackEvents(StackName => $stackid) or die "describe stack events failed: $!";
   @stackeventlists = $stackeventsoutput->StackEvents;
   foreach $stackeventlist (@stackeventlists) {
-    while ($stackevent = shift(@$stackeventlist)) {
+    while ($stackevent = pop(@$stackeventlist)) {
       $rstatus = $stackevent->ResourceStatus;
       $rstatusreason = $stackevent->ResourceStatusReason;
       $rtype = $stackevent->ResourceType;
@@ -61,7 +61,7 @@ while (!(grep(/CREATE_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist)) && !(
     $stackeventsoutput = $cfddg->DescribeStackEvents(StackName => $stackid, NextToken => $stackevents->NextToken) or die "describe stack events failed: $!";
     @stackeventlists = $stackeventsoutput->StackEvents;
     foreach $stackeventlist (@stackeventlists) {
-      while ($stackevent = shift(@$stackeventlist)) {
+      while ($stackevent = pop(@$stackeventlist)) {
         $rstatus = $stackevent->ResourceStatus;
         $rstatusreason = $stackevent->ResourceStatusReason;
         $rtype = $stackevent->ResourceType;
