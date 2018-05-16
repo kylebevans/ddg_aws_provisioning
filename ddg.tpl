@@ -290,7 +290,7 @@
                 "command" : "apt-get update && apt-get -y upgrade"
               },
               "run_chef" : {
-                "command" : "chef-solo -c /var/chef/solo.rb -j /var/chef/solo.json -L /var/log/chef-client.log"
+                "command" : "chef-solo -c /var/chef/solo.rb -j /var/chef/solo.json"
               }
             }
           }
