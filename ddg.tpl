@@ -260,7 +260,9 @@
               "/var/chef/cookbooks/kbe_login_banner" : "https://github.com/kylebevans/kbe_login_banner/tarball/master",
               "/var/chef/cookbooks/kbe_ssh" : "https://github.com/kylebevans/kbe_ssh/tarball/master",
               "/var/chef/cookbooks/kbe_perl" : "https://github.com/kylebevans/kbe_perl/tarball/master",
-              "/var/chef/cookbooks/kbe_nginx" : "https://github.com/kylebevans/kbe_nginx/tarball/master"
+              "/var/chef/cookbooks/kbe_nginx" : "https://github.com/kylebevans/kbe_nginx/tarball/master",
+              "/var/chef/cookbooks/kbe_rsyslog" : "https://github.com/kylebevans/kbe_rsyslog/tarball/master"
+
             },
             "files" : {
               "/var/chef/solo.rb" : {
