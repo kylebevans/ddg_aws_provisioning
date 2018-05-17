@@ -196,7 +196,7 @@
         },
         "Name": "ddgIPv6SearchTargetGroup",
         "Port": 80,
-        "Protocol": "HTTPS",
+        "Protocol": "HTTP",
         "UnhealthyThresholdCount": 4,
         "VpcId": {"Ref" : "ddgVPC"}
       }
