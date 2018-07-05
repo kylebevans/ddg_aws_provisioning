@@ -6,7 +6,7 @@ use Data::Printer;
 
 
 # read in the cloudformation template
-my $file = "ddg.tpl";
+my $file = "kbe.tpl";
 my $cftemplate;
 {
     local $/;
@@ -15,16 +15,25 @@ my $cftemplate;
 }
 
 # assumes AWS credentials are stored in ~/.aws/credentials
-# create the stack in us-east-2
-my $cfddg = Paws->service('CloudFormation', region => 'us-east-2') or die "can't create CloudFormation object: $!";
 
-@parameters = { ParameterKey => "KeyName", ParameterValue => "kylebe-key-pair-useast2" };
+my $iam = Paws->service('IAM');
+
+my $CreateAccessKeyResponse = $iam->CreateAccessKey();
+ 
+# Results:
+my $AccessKey = $CreateAccessKeyResponse->AccessKey;
+
+
+# create the stack in us-east-2
+my $cfkbe = Paws->service('CloudFormation', region => 'us-east-2') or die "can't create CloudFormation object: $!";
+
+@parameters = { ParameterKey => "KeyName", ParameterValue => $AccessKey };
 
 $parameters_ref = \@parameters;
 
-my $stackoutput = $cfddg->CreateStack(
+my $stackoutput = $cfkbe->CreateStack(
   Parameters => $parameters_ref,
-  StackName => "ddgstack",
+  StackName => "kbestack",
   TemplateBody => $cftemplate
 ) or die "stack creation failed: $!";
 
@@ -41,7 +50,7 @@ my $stackid = $stackoutput->StackId;
 my @eventlist;
 while (!(grep(/CREATE_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist)) && !(grep(/DELETE_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist)) && !(grep(/ROLLBACK_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist))) {
   # process first page of events
-  my $stackeventsoutput = $cfddg->DescribeStackEvents(StackName => $stackid) or die "describe stack events failed: $!";
+  my $stackeventsoutput = $cfkbe->DescribeStackEvents(StackName => $stackid) or die "describe stack events failed: $!";
   @stackeventlists = $stackeventsoutput->StackEvents;
   foreach $stackeventlist (@stackeventlists) {
     while ($stackevent = pop(@$stackeventlist)) {
@@ -58,7 +67,7 @@ while (!(grep(/CREATE_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist)) && !(
   }
   # process the rest of the pages of events if they exist
   while ($stackeventsoutput->NextToken) {
-    $stackeventsoutput = $cfddg->DescribeStackEvents(StackName => $stackid, NextToken => $stackevents->NextToken) or die "describe stack events failed: $!";
+    $stackeventsoutput = $cfkbe->DescribeStackEvents(StackName => $stackid, NextToken => $stackevents->NextToken) or die "describe stack events failed: $!";
     @stackeventlists = $stackeventsoutput->StackEvents;
     foreach $stackeventlist (@stackeventlists) {
       while ($stackevent = pop(@$stackeventlist)) {

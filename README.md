@@ -5,6 +5,10 @@ Provision an AWS Stack
 
 -Assumes AWS credentials are in ~/.aws/credentials
 
+-Assumes region is us-east-2
+
+-Assumes a keypair named "kylebe-key-pair-useast2" exists in the region
+
 -Depends on PAWS: https://metacpan.org/release/Paws
 
 ```
