@@ -16,19 +16,20 @@ my $cftemplate;
 
 # assumes AWS credentials are stored in ~/.aws/credentials
 
-my $iam = Paws->service('IAM');
+my $ec2 = Paws->service('EC2');
 
-my $CreateAccessKeyResponse = $iam->CreateAccessKey();
- 
-# Results:
-my $AccessKeyId = $CreateAccessKeyResponse->AccessKey->AccessKeyId;
+my $KeyPair = $ec2->CreateKeyPair(
+  {
+    'KeyName' => 'kbe-key-pair-useast2'
+  }
+);
 
 
 
 # create the stack in us-east-2
 my $cfkbe = Paws->service('CloudFormation', region => 'us-east-2') or die "can't create CloudFormation object: $!";
 
-@parameters = { ParameterKey => "KeyName", ParameterValue => $AccessKeyId };
+@parameters = { ParameterKey => "KeyName", ParameterValue => "kbe-key-pair-useast2" };
 
 $parameters_ref = \@parameters;
 
