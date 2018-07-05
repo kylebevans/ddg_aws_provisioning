@@ -255,7 +255,7 @@
               }
             },
             "sources" : {
-              "/var/chef/cookbooks/kbe_kbe_search" : "https://github.com/kylebevans/kbe_kbe_search/tarball/master",
+              "/var/chef/cookbooks/kbe_perl_app" : "https://github.com/kylebevans/kbe_perl_app/tarball/master",
               "/var/chef/cookbooks/kbe_role_ubuntu_1604_base" : "https://github.com/kylebevans/kbe_role_ubuntu_1604_base/tarball/master",
               "/var/chef/cookbooks/kbe_login_banner" : "https://github.com/kylebevans/kbe_login_banner/tarball/master",
               "/var/chef/cookbooks/kbe_ssh" : "https://github.com/kylebevans/kbe_ssh/tarball/master",
@@ -279,7 +279,7 @@
               "/var/chef/solo.json" : {
                 "content" : { "Fn::Join" : ["", [
                   "{\n",
-                  "\"run_list\": [ \"recipe[kbe_kbe_search]\" ]\n",
+                  "\"run_list\": [ \"recipe[kbe_perl_app]\" ]\n",
                   "}"
                 ]]},
                 "mode"  : "000644",
