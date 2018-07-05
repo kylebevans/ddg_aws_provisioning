@@ -21,13 +21,14 @@ my $iam = Paws->service('IAM');
 my $CreateAccessKeyResponse = $iam->CreateAccessKey();
  
 # Results:
-my $AccessKey = $CreateAccessKeyResponse->AccessKey;
+my $AccessKeyId = $CreateAccessKeyResponse->AccessKey->AccessKeyId;
+
 
 
 # create the stack in us-east-2
 my $cfkbe = Paws->service('CloudFormation', region => 'us-east-2') or die "can't create CloudFormation object: $!";
 
-@parameters = { ParameterKey => "KeyName", ParameterValue => $AccessKey };
+@parameters = { ParameterKey => "KeyName", ParameterValue => $AccessKeyId };
 
 $parameters_ref = \@parameters;
 
