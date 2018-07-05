@@ -5,6 +5,8 @@ Provision an AWS Stack
 
 -Assumes AWS credentials are in ~/.aws/credentials
 
+-Depends on PAWS: https://metacpan.org/release/Paws
+
 ```
 perl aws_arch.pl
 ```
