@@ -28,7 +28,7 @@
     }
   },
   "Resources": {
-    "ddgVPC" : {
+    "kbeVPC" : {
          "Type" : "AWS::EC2::VPC",
          "Properties" : {
           "CidrBlock" : "10.0.0.0/16",
@@ -37,29 +37,29 @@
           "InstanceTenancy" : "default"
          }
     },
-    "ddgRouteTable" : {
+    "kbeRouteTable" : {
       "Type" : "AWS::EC2::RouteTable",
       "Properties" : {
-        "VpcId" : { "Ref" : "ddgVPC" }
+        "VpcId" : { "Ref" : "kbeVPC" }
       }
     },
-    "ddgIpv6VPCCidrBlock": {
+    "kbeIpv6VPCCidrBlock": {
       "Type": "AWS::EC2::VPCCidrBlock",
       "Properties": {
         "AmazonProvidedIpv6CidrBlock": true,
-        "VpcId": { "Ref" : "ddgVPC" }
+        "VpcId": { "Ref" : "kbeVPC" }
       }
     },
-    "ddgSubnetA": {
+    "kbeSubnetA": {
       "Type" : "AWS::EC2::Subnet",
-      "DependsOn" : "ddgIpv6VPCCidrBlock",
+      "DependsOn" : "kbeIpv6VPCCidrBlock",
       "Properties" : {
-        "VpcId" : { "Ref" : "ddgVPC" },
+        "VpcId" : { "Ref" : "kbeVPC" },
         "CidrBlock" : "10.0.0.0/20",
         "Ipv6CidrBlock": {
           "Fn::Select": [
             0, {
-              "Fn::Cidr": [ { "Fn::Select": [ 0, { "Fn::GetAtt": [ "ddgVPC", "Ipv6CidrBlocks" ] } ] }, "256", "64" ]
+              "Fn::Cidr": [ { "Fn::Select": [ 0, { "Fn::GetAtt": [ "kbeVPC", "Ipv6CidrBlocks" ] } ] }, "256", "64" ]
             }
           ]
         },
@@ -74,16 +74,16 @@
         }
       }
     },
-    "ddgSubnetB": {
+    "kbeSubnetB": {
       "Type" : "AWS::EC2::Subnet",
-      "DependsOn" : "ddgIpv6VPCCidrBlock",
+      "DependsOn" : "kbeIpv6VPCCidrBlock",
       "Properties" : {
-        "VpcId" : { "Ref" : "ddgVPC" },
+        "VpcId" : { "Ref" : "kbeVPC" },
         "CidrBlock" : "10.0.16.0/20",
         "Ipv6CidrBlock": {
           "Fn::Select": [
             1, {
-              "Fn::Cidr": [ { "Fn::Select": [ 0, { "Fn::GetAtt": [ "ddgVPC", "Ipv6CidrBlocks" ] } ] }, "256", "64" ]
+              "Fn::Cidr": [ { "Fn::Select": [ 0, { "Fn::GetAtt": [ "kbeVPC", "Ipv6CidrBlocks" ] } ] }, "256", "64" ]
             }
           ]
         },
@@ -98,16 +98,16 @@
         }
       }
     },
-    "ddgSubnetC": {
+    "kbeSubnetC": {
       "Type" : "AWS::EC2::Subnet",
-      "DependsOn" : "ddgIpv6VPCCidrBlock",
+      "DependsOn" : "kbeIpv6VPCCidrBlock",
       "Properties" : {
-        "VpcId" : { "Ref" : "ddgVPC" },
+        "VpcId" : { "Ref" : "kbeVPC" },
         "CidrBlock" : "10.0.32.0/20",
         "Ipv6CidrBlock": {
           "Fn::Select": [
             2, {
-              "Fn::Cidr": [ { "Fn::Select": [ 0, { "Fn::GetAtt": [ "ddgVPC", "Ipv6CidrBlocks" ] } ] }, "256", "64" ]
+              "Fn::Cidr": [ { "Fn::Select": [ 0, { "Fn::GetAtt": [ "kbeVPC", "Ipv6CidrBlocks" ] } ] }, "256", "64" ]
             }
           ]
         },
@@ -122,68 +122,68 @@
         }
       }
     },
-    "ddgSubnetARouteTableAssociation" : {
+    "kbeSubnetARouteTableAssociation" : {
       "Type" : "AWS::EC2::SubnetRouteTableAssociation",
       "Properties" : {
-        "SubnetId" : { "Ref" : "ddgSubnetA" },
-        "RouteTableId" : { "Ref" : "ddgRouteTable" }
+        "SubnetId" : { "Ref" : "kbeSubnetA" },
+        "RouteTableId" : { "Ref" : "kbeRouteTable" }
       }
     },
-    "ddgSubnetBRouteTableAssociation" : {
+    "kbeSubnetBRouteTableAssociation" : {
       "Type" : "AWS::EC2::SubnetRouteTableAssociation",
       "Properties" : {
-        "SubnetId" : { "Ref" : "ddgSubnetB" },
-        "RouteTableId" : { "Ref" : "ddgRouteTable" }
+        "SubnetId" : { "Ref" : "kbeSubnetB" },
+        "RouteTableId" : { "Ref" : "kbeRouteTable" }
       }
     },
-    "ddgSubnetCRouteTableAssociation" : {
+    "kbeSubnetCRouteTableAssociation" : {
       "Type" : "AWS::EC2::SubnetRouteTableAssociation",
       "Properties" : {
-        "SubnetId" : { "Ref" : "ddgSubnetC" },
-        "RouteTableId" : { "Ref" : "ddgRouteTable" }
+        "SubnetId" : { "Ref" : "kbeSubnetC" },
+        "RouteTableId" : { "Ref" : "kbeRouteTable" }
       }
     },
-    "ddgGateway": {
+    "kbeGateway": {
       "Type" : "AWS::EC2::InternetGateway"
     },
-    "ddgGatewayAttachment": {
+    "kbeGatewayAttachment": {
       "Type" : "AWS::EC2::VPCGatewayAttachment",
       "Properties" : {
-        "VpcId" : { "Ref" : "ddgVPC" },
-        "InternetGatewayId" : { "Ref" : "ddgGateway" }
+        "VpcId" : { "Ref" : "kbeVPC" },
+        "InternetGatewayId" : { "Ref" : "kbeGateway" }
       }
     },
-    "ddgIPv4DefaultRoute" : {
+    "kbeIPv4DefaultRoute" : {
       "Type" : "AWS::EC2::Route",
-      "DependsOn" : "ddgGatewayAttachment",
+      "DependsOn" : "kbeGatewayAttachment",
       "Properties" : {
-        "RouteTableId" : { "Ref" : "ddgRouteTable" },
+        "RouteTableId" : { "Ref" : "kbeRouteTable" },
         "DestinationCidrBlock" : "0.0.0.0/0",
-        "GatewayId" : { "Ref" : "ddgGateway" }
+        "GatewayId" : { "Ref" : "kbeGateway" }
       }
     },
-    "ddgIPv6DefaultRoute" : {
+    "kbeIPv6DefaultRoute" : {
       "Type" : "AWS::EC2::Route",
-      "DependsOn" : "ddgGatewayAttachment",
+      "DependsOn" : "kbeGatewayAttachment",
       "Properties" : {
-        "RouteTableId" : { "Ref" : "ddgRouteTable" },
+        "RouteTableId" : { "Ref" : "kbeRouteTable" },
         "DestinationIpv6CidrBlock" : "::/0",
-        "GatewayId" : { "Ref" : "ddgGateway" }
+        "GatewayId" : { "Ref" : "kbeGateway" }
       }
     },
-    "ddgIPv6SearchElasticLoadBalancer" : {
+    "kbeIPv6SearchElasticLoadBalancer" : {
       "Type" : "AWS::ElasticLoadBalancingV2::LoadBalancer",
-      "DependsOn" : "ddgGatewayAttachment",
+      "DependsOn" : "kbeGatewayAttachment",
       "Properties": {
-        "Name" : "ddgIPv6SearchElasticLoadBalancer",
+        "Name" : "kbeIPv6SearchElasticLoadBalancer",
         "Scheme" : "internet-facing",
-        "Subnets" : [ {"Ref": "ddgSubnetA"}, {"Ref" : "ddgSubnetB"}, {"Ref" : "ddgSubnetC"} ],
-        "SecurityGroups": [ {"Ref": "ddgALBSecurityGroup"} ],
+        "Subnets" : [ {"Ref": "kbeSubnetA"}, {"Ref" : "kbeSubnetB"}, {"Ref" : "kbeSubnetC"} ],
+        "SecurityGroups": [ {"Ref": "kbeALBSecurityGroup"} ],
         "Type": "application",
         "IpAddressType": "dualstack"
       }
     },
-    "ddgIPv6SearchTargetGroup" : {
+    "kbeIPv6SearchTargetGroup" : {
       "Type" : "AWS::ElasticLoadBalancingV2::TargetGroup",
       "Properties" : {
         "HealthCheckIntervalSeconds": 30,
@@ -194,40 +194,40 @@
         "Matcher" : {
           "HttpCode" : "200"
         },
-        "Name": "ddgIPv6SearchTargetGroup",
+        "Name": "kbeIPv6SearchTargetGroup",
         "Port": 80,
         "Protocol": "HTTP",
         "UnhealthyThresholdCount": 4,
-        "VpcId": {"Ref" : "ddgVPC"}
+        "VpcId": {"Ref" : "kbeVPC"}
       }
     },
-    "ddgIPv6SearchListener": {
+    "kbeIPv6SearchListener": {
       "Type": "AWS::ElasticLoadBalancingV2::Listener",
       "Properties": {
         "DefaultActions": [{
           "Type": "forward",
-          "TargetGroupArn": { "Ref": "ddgIPv6SearchTargetGroup" }
+          "TargetGroupArn": { "Ref": "kbeIPv6SearchTargetGroup" }
         }],
-        "LoadBalancerArn": { "Ref": "ddgIPv6SearchElasticLoadBalancer" },
+        "LoadBalancerArn": { "Ref": "kbeIPv6SearchElasticLoadBalancer" },
         "Port": "80",
         "Protocol": "HTTP"
       }
     },
-    "ddgIPv6SearchWebServerGroup" : {
+    "kbeIPv6SearchWebServerGroup" : {
       "Type" : "AWS::AutoScaling::AutoScalingGroup",
-      "DependsOn" : "ddgGatewayAttachment",
+      "DependsOn" : "kbeGatewayAttachment",
       "Properties" : {
-        "AutoScalingGroupName" : "ddgIPv6WebServerGroup",
+        "AutoScalingGroupName" : "kbeIPv6WebServerGroup",
         "AvailabilityZones" : { "Fn::GetAZs" : { "Ref" : "AWS::Region" } },
         "Cooldown" : "300",
-        "LaunchConfigurationName" : { "Ref" : "ddgIPv6SearchLaunchConfig" },
+        "LaunchConfigurationName" : { "Ref" : "kbeIPv6SearchLaunchConfig" },
         "MinSize" : "2",
         "MaxSize" : "6",
         "DesiredCapacity" : "4",
         "HealthCheckGracePeriod" : "600",
         "HealthCheckType" : "ELB",
-        "TargetGroupARNs": [ { "Ref": "ddgIPv6SearchTargetGroup" } ],
-        "VPCZoneIdentifier" : [ {"Ref": "ddgSubnetA"}, {"Ref" : "ddgSubnetB"}, {"Ref" : "ddgSubnetC"} ]
+        "TargetGroupARNs": [ { "Ref": "kbeIPv6SearchTargetGroup" } ],
+        "VPCZoneIdentifier" : [ {"Ref": "kbeSubnetA"}, {"Ref" : "kbeSubnetB"}, {"Ref" : "kbeSubnetC"} ]
       },
       "CreationPolicy" : {
         "ResourceSignal" : {
@@ -243,9 +243,9 @@
         }
       }
     },
-    "ddgIPv6SearchLaunchConfig": {
+    "kbeIPv6SearchLaunchConfig": {
       "Type" : "AWS::AutoScaling::LaunchConfiguration",
-      "DependsOn" : "ddgGatewayAttachment",
+      "DependsOn" : "kbeGatewayAttachment",
       "Metadata" : {
         "AWS::CloudFormation::Init" : {
           "config" : {
@@ -255,7 +255,7 @@
               }
             },
             "sources" : {
-              "/var/chef/cookbooks/kbe_ddg_search" : "https://github.com/kylebevans/kbe_ddg_search/tarball/master",
+              "/var/chef/cookbooks/kbe_kbe_search" : "https://github.com/kylebevans/kbe_kbe_search/tarball/master",
               "/var/chef/cookbooks/kbe_role_ubuntu_1604_base" : "https://github.com/kylebevans/kbe_role_ubuntu_1604_base/tarball/master",
               "/var/chef/cookbooks/kbe_login_banner" : "https://github.com/kylebevans/kbe_login_banner/tarball/master",
               "/var/chef/cookbooks/kbe_ssh" : "https://github.com/kylebevans/kbe_ssh/tarball/master",
@@ -279,7 +279,7 @@
               "/var/chef/solo.json" : {
                 "content" : { "Fn::Join" : ["", [
                   "{\n",
-                  "\"run_list\": [ \"recipe[kbe_ddg_search]\" ]\n",
+                  "\"run_list\": [ \"recipe[kbe_kbe_search]\" ]\n",
                   "}"
                 ]]},
                 "mode"  : "000644",
@@ -314,7 +314,7 @@
         },
         "InstanceMonitoring" : "false",
         "InstanceType": "t2.micro",
-        "SecurityGroups": [ { "Ref": "ddgIPv6SearchSecurityGroup" } ],
+        "SecurityGroups": [ { "Ref": "kbeIPv6SearchSecurityGroup" } ],
         "UserData"       : { "Fn::Base64" : { "Fn::Join" : ["", [
           "#!/bin/bash -xe\n",
 
@@ -327,21 +327,21 @@
             
           "/usr/local/bin/cfn-init -v ",
           "         --stack ", { "Ref" : "AWS::StackName" },
-          "         --resource ddgIPv6SearchLaunchConfig ",
+          "         --resource kbeIPv6SearchLaunchConfig ",
           "         --region ", { "Ref" : "AWS::Region" }, "\n",
 
           "/usr/local/bin/cfn-signal -e $? ",
           "         --stack ", { "Ref" : "AWS::StackName" },
-          "         --resource ddgIPv6SearchWebServerGroup ",
+          "         --resource kbeIPv6SearchWebServerGroup ",
           "         --region ", { "Ref" : "AWS::Region" }, "\n"
         ]]}}
       }
     },
-    "ddgIPv6SearchSecurityGroup": {
+    "kbeIPv6SearchSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
         "GroupDescription": "Enable SSH access via port 22",
-        "VpcId": { "Ref" : "ddgVPC" },
+        "VpcId": { "Ref" : "kbeVPC" },
         "SecurityGroupIngress": [
           {
             "IpProtocol": "tcp",
@@ -359,22 +359,22 @@
             "IpProtocol": "tcp",
             "FromPort": "80",
             "ToPort": "80",
-            "SourceSecurityGroupId" : { "Ref" : "ddgALBSecurityGroup" }
+            "SourceSecurityGroupId" : { "Ref" : "kbeALBSecurityGroup" }
           },
           {
             "IpProtocol": "tcp",
             "FromPort": "443",
             "ToPort": "443",
-            "SourceSecurityGroupId" : { "Ref" : "ddgALBSecurityGroup" }
+            "SourceSecurityGroupId" : { "Ref" : "kbeALBSecurityGroup" }
           }
         ]
       }
     },
-    "ddgALBSecurityGroup": {
+    "kbeALBSecurityGroup": {
       "Type": "AWS::EC2::SecurityGroup",
       "Properties": {
         "GroupDescription": "Enable http/https",
-        "VpcId": { "Ref" : "ddgVPC" },
+        "VpcId": { "Ref" : "kbeVPC" },
         "SecurityGroupIngress": [
           {
             "IpProtocol": "tcp",
@@ -407,7 +407,7 @@
   "Outputs" : {
     "URL": {
       "Description": "URL of the website",
-      "Value": { "Fn::Join": [ "", [ "http://", { "Fn::GetAtt": [ "ddgIPv6SearchElasticLoadBalancer", "DNSName" ] } ] ] }
+      "Value": { "Fn::Join": [ "", [ "http://", { "Fn::GetAtt": [ "kbeIPv6SearchElasticLoadBalancer", "DNSName" ] } ] ] }
     }
   }
 }
