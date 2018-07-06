@@ -16,7 +16,7 @@ my $cftemplate;
 
 # assumes AWS credentials are stored in ~/.aws/credentials
 
-my $ec2 = Paws->service('EC2');
+my $ec2 = Paws->service('EC2', region => 'us-east-2');
 
 my $KeyPair = $ec2->CreateKeyPair(
   {
