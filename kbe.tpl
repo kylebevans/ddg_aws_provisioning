@@ -289,7 +289,7 @@
             },
             "commands" : {
               "apt_update_upgrade" : {
-                "command" : "apt-get update && apt-get -y upgrade"
+                "command" : "apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade"
               },
               "run_chef" : {
                 "command" : "chef-solo -c /var/chef/solo.rb -j /var/chef/solo.json -L /var/log/chef/chef-solo.log"
@@ -319,7 +319,7 @@
           "#!/bin/bash -xe\n",
 
           "apt-get -y update\n",
-          "apt-get -y upgrade\n",
+          "DEBIAN_FRONTEND=noninteractive apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade\n",
           
           "apt-get -y install python-setuptools\n",
           "easy_install https://s3.amazonaws.com/cloudformation-examples/aws-cfn-bootstrap-latest.tar.gz\n",

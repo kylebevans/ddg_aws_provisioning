@@ -19,6 +19,7 @@ my $cftemplate;
 my $ec2 = Paws->service('EC2', region => 'us-east-2') or die "can't create KeyPair: $!";
 
 my $KeyPair = $ec2->CreateKeyPair(KeyName => 'kbe-key-pair-useast2');
+print $KeyPair->KeyMaterial . "\n";
 
 
 
@@ -82,4 +83,11 @@ while (!(grep(/CREATE_COMPLETE AWS::CloudFormation::Stack.+/, @eventlist)) && !(
     }
   }
 }
+
+# print the URL of the site
+my $describestacksoutput = $cfkbe->DescribeStacks(StackName => $stackid) or die "describe stacks failed: $!";
+@stacks = $describestacksoutput->Stacks;
+$kbestack = pop($stacks[0]);
+@kbestackoutputs = $kbestack->Outputs;
+p @kbestackoutputs;
 
